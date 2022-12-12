@@ -1,0 +1,4 @@
+name: WebSocketServer
+version: '${project.version}'
+main: git.hashibutogarasu.websocket.websocketserver.McWebSocketServerPlugin
+api-version: 1.19
