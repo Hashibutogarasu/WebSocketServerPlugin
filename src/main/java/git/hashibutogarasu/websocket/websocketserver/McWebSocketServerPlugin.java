@@ -3,7 +3,7 @@ package git.hashibutogarasu.websocket.websocketserver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import git.hashibutogarasu.util.PortUtil;
+import git.hashibutogarasu.mojangapiutil.util.PortUtil;
 import git.hashibutogarasu.websocket.server.WebSocketServerMain;
 import git.hashibutogarasu.websocket.translator.Translator;
 import org.bukkit.plugin.java.JavaPlugin;

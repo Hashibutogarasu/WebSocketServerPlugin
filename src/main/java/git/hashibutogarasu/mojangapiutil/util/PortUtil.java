@@ -1,4 +1,4 @@
-package git.hashibutogarasu.util;
+package git.hashibutogarasu.mojangapiutil.util;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
