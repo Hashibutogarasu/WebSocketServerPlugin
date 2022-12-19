@@ -1,1 +1,2 @@
 # WebSocketServerPlugin
+Minecraft Server(Java)のログなどをWebSocketで受信できるようにするプラグイン
