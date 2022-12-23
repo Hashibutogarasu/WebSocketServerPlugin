@@ -7,11 +7,18 @@ import com.google.gson.annotations.SerializedName;
 import org.java_websocket.WebSocket;
 import org.jetbrains.annotations.NotNull;
 
-public class Formatter {
-    private WebSocket webSocket;
-    private LocationType locationType;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
+import java.util.logging.Logger;
 
-    public static enum LocationType{
+public class Formatter {
+    private final WebSocket webSocket;
+    private final LocationType locationType;
+
+    public enum LocationType{
         NORMAL,
         DISCORD
     }
@@ -27,8 +34,28 @@ public class Formatter {
             JsonModel model = new JsonModel();
             model.eventname = eventname;
             model.ip = this.webSocket.getRemoteSocketAddress().getAddress().getHostAddress();
-            if(player_name != null) model.player_name = player_name;
+            if(player_name != null) {
+                model.player_name = player_name;
+                File face_path = new File("./wsdata/" + player_name + "/" + player_name + "_face.png");
+                try {
+                    String contentType = Files.probeContentType(face_path.toPath());
+                    byte[] data = Files.readAllBytes(face_path.toPath());
+                    // byte[]をbase64文字列に変換する(java8)
+                    String base64str = Base64.getEncoder().encodeToString(data);
+
+                    // data URIを作る
+                    String sb = "data:" +
+                            contentType +
+                            ";base64," +
+                            base64str;
+
+                    model.icon_base64 = sb;
+                } catch (IOException ignored) {
+
+                }
+            }
             model.message = beforeformatstring;
+
             ObjectMapper mapper = new ObjectMapper();
             System.out.println(mapper.writeValueAsString(model));
             return mapper.writeValueAsString(model);
@@ -52,5 +79,8 @@ public class Formatter {
         @SerializedName("event_name")
         @Expose
         public String eventname;
+        @SerializedName("icon_base64")
+        @Expose
+        public String icon_base64;
     }
 }

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -86,6 +86,7 @@ public class MinecraftSkin {
         if(!new File(player_path.toString()).exists()) Files.createDirectory(player_path);
         String image_path = player_path + "\\" + player_name + "." + ext;
         String face_path = player_path + "\\" + player_name + "_face." + ext;
+        String face_path_resized = player_path + "\\" + player_name + "_face_resized." + ext;
 
         this.skin_image_path = Path.of(image_path);
 
@@ -109,6 +110,7 @@ public class MinecraftSkin {
         in.close();
 
         getFace(image_path, face_path);
+        scaleImage(new File(face_path),256,256, new File(face_path_resized));
     }
 
     public void getFace(String filepath, String outputpath) throws IOException {
@@ -124,5 +126,38 @@ public class MinecraftSkin {
         graphics1.dispose();
 
         ImageIO.write(face1, "png", new File(outputpath));
+    }
+
+
+    /**
+     *
+     * @param in 読み込むファイル
+     * @param destWidth 出力する画像の横の最大サイズ
+     * @param destHeight 出力する画像の縦の最大サイズ
+     * @return BufferedImage
+     * @throws IOException
+     */
+    public static BufferedImage scaleImage(File in, int destWidth, int destHeight, File output) throws IOException {
+        BufferedImage src = ImageIO.read(in);
+
+        int width = src.getWidth();    // オリジナル画像の幅
+        int height = src.getHeight();  // オリジナル画像の高さ
+
+        // 縦横の比率から、scaleを決める
+        double widthScale = (double) destWidth / (double) width;
+        double heightScale = (double) destHeight / (double) height;
+        double scale = widthScale < heightScale ? widthScale : heightScale;
+
+        ImageFilter filter = new AreaAveragingScaleFilter(
+                (int) (src.getWidth() * scale), (int) (src.getHeight() * scale));
+        ImageProducer p = new FilteredImageSource(src.getSource(), filter);
+        Image dstImage = Toolkit.getDefaultToolkit().createImage(p);
+        BufferedImage dst = new BufferedImage(
+                dstImage.getWidth(null), dstImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = dst.createGraphics();
+        g.drawImage(dstImage, 0, 0, null);
+        g.dispose();
+        ImageIO.write(dst,"png", output);
+        return dst;
     }
 }
